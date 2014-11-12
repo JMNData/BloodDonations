@@ -23,13 +23,17 @@ attach(Train)
 #Train Data
 mycontrol = rpart.control(cp = 0, xval = 20, surrogatestyle = 1)
 model.rpart = rpart(Made.Donation.in.March.2007~., data=Train[,-1], method="class", control = mycontrol)
+#model.rpart = rpart(Made.Donation.in.March.2007~., data=Train[,-1], method="class")
+post(model.rpart, file="Tree.ps", title = "CLass Tree for Blood")
+model.rpartp = prune(model.rpart, cp=model.rpart$cptable[which.min(model.rpart$cptable[,"xerror"]),"CP"])
+
+
 model.svm = svm(Made.Donation.in.March.2007~., data=Train[,-1], method="class", probability=FALSE, kernal="radial", gamma=1, cost=1)
 model.rf = randomForest(Made.Donation.in.March.2007~., data=Train[,-1], method="class")
 model.ct = ctree(Made.Donation.in.March.2007~., data=Train[,-1])
 
 #RPART
 Predicted.rpart = cbind(Train, predicted = predict(model.rpart, Train[,-1], type="class"))
-Predicted.rpart = cbind(Train, predicted = predict(model.rpart, Train[,-1], type="prob"))
 print("RPART")
 table(Predicted.rpart$Made.Donation.in.March.2007,Predicted.rpart$predicted)
 Predicted.rpart = cbind(Test, predicted = predict(model.rpart, Test[,-1], type="prob"))
